@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{title}}</title>
+
+    <!-- Global stylesheets -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet"
+        type="text/css">
+    <link href="/global_assets/css/icons/icomoon/styles.min.css" rel="stylesheet" type="text/css">
+    <link href="/assets/css/all.min.css" rel="stylesheet" type="text/css">
+
+    <!-- /global stylesheets -->
+
+    <!-- Core JS files -->
+    <script src="/global_assets/js/main/jquery.min.js"></script>
+    <script src="/global_assets/js/main/bootstrap.bundle.min.js"></script>
+    <!-- /core JS files -->
+
+    <!-- Theme JS files -->
+    <script src="/global_assets/js/plugins/visualization/echarts/echarts.min.js"></script>
+    <script src="/global_assets/js/plugins/maps/echarts/world.js"></script>
+
+    <script src="/assets/js/app.js"></script>
+    <script src="/global_assets/js/demo_charts/pages/dashboard_6/dark/area_gradient.js"></script>
+    <script src="/global_assets/js/demo_charts/pages/dashboard_6/dark/map_europe_effect.js"></script>
+    <script src="global_assets/js/demo_charts/pages/dashboard_6/dark/progress_sortable.js"></script>
+    <script src="global_assets/js/demo_charts/pages/dashboard_6/dark/bars_grouped.js"></script>
+    <script src="/global_assets/js/demo_charts/pages/dashboard_6/dark/line_label_marks.js"></script>
+    <!-- /theme JS files -->
+
+</head>
+
+<body>
+    <!-- Nav bar -->
+    <div class="navbar navbar-expand-xl navbar-light navbar-static px-0">
+
+        <div
+            class="d-flex w-100 w-xl-auto overflow-auto overflow-xl-visible scrollbar-hidden border-top border-top-light-100 border-top-xl-0 order-1 order-xl-0">
+            <ul class="navbar-nav navbar-nav-underline flex-row text-nowrap mx-auto">
+                <li class="nav-item">
+                    <a href="/SetUp" class="navbar-nav-link">
+                        <i class="icon-person mr-2"></i>
+                        Setup
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="/Product" class="navbar-nav-link active">
+                        <i class="icon-person mr-2"></i>
+                        Product
+                    </a>
+                </li>
+
+
+            </ul>
+        </div>
+
+    </div>
+    <!-- / Nav Bar -->
+
+    <style>
+        ::file-selector-button {
+            display: none;
+        }
+    </style>
+    <script>
+        function UpdateStock(store, productId) {
+            var quantity = document.getElementById('Quantity').value;
+            let action = `/UpdateStock?store=${store}&productId=${productId}&quantity=${quantity}`;
+            window.location.replace(action);
+            return;
+        }
+
+        setTimeout(() => {
+            $('#success_msg').fadeOut('fast');
+            document.getElementById('#success_msg').style.display = block;
+            //}
+        }, 10000); // <-- time in milliseconds  
+
+        setTimeout(() => {
+            $('#productstock_Message').fadeOut('fast');
+        }, 5000); // <-- time in milliseconds 
+
+        setTimeout(() => {
+            $('#product_msg').fadeOut('fast');
+        }, 5000); // <-- time in milliseconds 
+
+
+    </script>
+
+    <div class="page-content">
+        <div class="content-wrapper">
+
+            <!-- Inner content -->
+            <div class="content-inner">
+                <!-- Content area -->
+
+                
+            <div class="container-fluid">
+                <div class="row justify-content-start mt-4">
+                    <div class="col-6 text-center" style="border: 2px solid grey;margin-left:3%;px;padding: 20px 20px;border-radius: 12px;">
+                        <form  method="post" action="/Product">
+                            <div class="row justify-content-around text-center">
+                                <select class="custom-select col-3" name="store" required style="background-color: #d9d9d9a6;color:black">
+                                    {{#each stores}}
+                                        <option value="{{this.storefrontStoreCode}}">{{this.storefrontStoreCode}}</option>
+                                    {{/each}}
+                                </select>
+
+                                <input type="text" class="form-control col-6" id="sku-ID" placeholder="Sku-ID"
+                                    style="border:none;font-size:14px" name="skuId" required>
+
+                                <button type="submit"
+                                    class="btn btn-outline-light-100 text-white text-center btn-primary col-2"
+                                    onclick="window.location.replace('/Product')">Search</button>
+                            </div>
+                        </form>
+
+
+                    </div>
+                    <div class="col-5 text-center" style="border: 2px solid grey;padding: 20px;margin-left:3%;border-radius: 12px;">
+                            <form action="/uploadFile" method="post" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-3">
+                                        <input type="button" class="form-control" id="loadFileXml" style="width:100% ;"
+                                            value="Upload Excel" onclick="document.getElementById('file').click();" />
+                                        <input type="hidden" name="filePath" value="{{storeData.filePath}}">
+                                        <input id='file' name="file" type="file" accept=".csv" required>
+
+                                    </div>
+                                    <div class="col-2 text-center">
+                                        <input type="submit" class="btn-primary" name="submit"
+                                        style="padding: 6px 10px;outline: none;border-radius: 5px;border:none">
+                                    </div>
+                                    <div class="col-5">
+                                        <a onclick="updateAllProducts()" class="btn-primary" style="padding: 8px 12px;font-size:14px;position:relative;top:7px;outline: none;border-radius: 5px;border:none">Update All Products Stock</a>                               
+                                    </div>
+                                    {{!-- <div class="col-5">
+                                        <a class="btn-primary" id="attach" style="padding: 8px 12px;font-size:14px;position:relative;top:7px;outline: none;border-radius: 5px;border:none">Update All Products Stock</a>                               
+                                    </div> --}}
+                                    <div class="col-2">
+                                        <img id="spinImg" src="/assets/images/icons8-spinning-circle.gif" alt="img" style="width: 50px;position: relative;right: 12px;top: 19px;display:none">
+                                    </div>
+
+                                </div>
+                                </form>
+                                <p id="spinText" style="font-size: 18px;color: #268bd2;position:relative;left:5%;display:none">Please Wait, Stock is being updated.... <br>This might take upto 5 minutes...</p>
+                    </div>
+                </div>
+            </div>
+
+
+                {{#if error}}
+                <p class="alert alert-danger mt-2">{{error}}</p>
+                {{/if}}
+
+                {{#if stock_Message}}
+                <p class="alert alert-danger mt-2" id="productstock_Message">{{stock_Message}}</p>
+                {{/if}}
+
+                {{#if productMessage}}
+                <p class="alert alert-danger mt-2" id="product_msg">{{productMessage}}</p>
+                {{/if}}
+
+                {{#if stockMessage}}
+                <p class="alert alert-success mt-2" id="success_msg">{{stockMessage}}</p>
+                {{/if}}
+
+                <div class="content container-fluid">
+                    <div class="row justify-content-between">
+                        <div class="col-6"
+                            style="overflow:auto;border:2px solid rgb(0, 0, 0);padding:5px;margin-left:3%;border-radius:15px">
+                            <div class="col-12 overflow-auto" style="padding-left: 0px;">
+                                <table class="table table-hover table-bordered w-100 text-center">
+                                    <thead>
+                                        <tr class="col-auto">
+                                            <th class="col-auto" style="padding-right: 40px;padding-left:30px">Stock
+                                            </th>
+                                            <th class="col-auto" style="min-width: 120px;">Merchant ID</th>
+                                            <th class="col-auto" style="min-width: 170px;">Merchant Product ID</th>
+                                            <th class="col-auto" style="min-width: 128px;">Primary Sku</th>
+                                            <th class="col-auto" style="min-width: 180px;">Merchant SKU ID</th>
+                                            <th class="col-auto" style="min-width: 250px;">SKU NAME</th>
+                                            <th class="col-auto" style="min-width: 380px;">SKU Name (Chi)</th>
+                                            <th class="col-auto" style="min-width: 110px;">Warehouse ID</th>
+                                            <th class="col-auto" style="min-width: 110px;">Stock Level</th>
+                                            <th class="col-auto" style="min-width: 110px;">Online Status</th>
+                                            <th class="col-auto" style="min-width: 110px;">Invisible</th>
+                                            <th class="col-auto" style="min-width: 110px;">Force Out Of Stock</th>
+                                            <th class="col-auto" style="min-width: 110px;">Create Date</th>
+                                            <th class="col-auto" style="min-width: 110px;">Offline Date</th>
+                                            <th class="col-auto" style="min-width: 110px;">Brand Name(En)</th>
+                                            <th class="col-auto" style="min-width: 110px;">Brand Name (Chi)</th>
+                                            <th class="col-auto" style="min-width: 110px;">Height</th>
+                                            <th class="col-auto" style="min-width: 110px;">Width</th>
+                                            <th class="col-auto" style="min-width: 110px;">Depth</th>
+                                            <th class="col-auto" style="min-width: 110px;">Packing Spec (En)</th>
+                                            <th class="col-auto" style="min-width: 110px;">Packing Spec (Chi)</th>
+                                            <th class="col-auto" style="min-width: 110px;">Primary Category Code</th>
+                                            <th class="col-auto" style="min-width: 110px;">Primary Category Name (chi)</th>
+                                            <th class="col-auto" style="min-width: 110px;">Currency</th>
+                                            <th class="col-auto" style="min-width: 110px;">Orignal Price</th>
+                                            <th class="col-auto" style="min-width: 110px;">Discount Price</th>
+                                            <th class="col-auto" style="min-width: 110px;">Discount Rate(%)</th>
+                                            <th class="col-auto" style="min-width: 110px;">VIP Discount Price</th>
+                                            <th class="col-auto" style="min-width: 110px;">VIP Discount Rate(%)</th>
+                                            <th class="col-auto" style="min-width: 110px;">GOLD VIP Discount Price</th>
+                                            <th class="col-auto" style="min-width: 110px;">GOLD VIP Discount Rate(%)</th>
+                                            <th class="col-auto" style="min-width: 110px;">Quantity</th>
+                                            <th class="col-auto" style="min-width: 110px;">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{#each storeData}}
+                                        <tr>
+                                            <td class="col-auto text-center justify-content-center">
+                                                <a style="font-size: 12px;padding: 3px 5px;position:relative;right:8px"
+                                                    href="/GetStock/{{this.MerchantSKUID}}" class="btn btn-primary"
+                                                    role="button">
+                                                    Get Stock</a>
+                                            </td>
+                                            <td class="merchant_id">{{this.MerchantID}}</td>
+                                            <td class="col-auto">{{this.MerchantProductID}}</td>
+                                            <td class="col-auto">{{this.PrimarySKU}}</td>
+                                            <td class="merchant_sku_id" style="padding: 0px 30px;">{{this.MerchantSKUID}}</td>
+                                            <td class="col-auto" style="padding: 0px 15px;">{{this.SKUName}}</td>
+                                            <td class="col-auto">{{this.SKUNameChi}}</td>
+                                            <td class="col-auto">{{this.WarehouseID}}</td>
+                                            <td class="col-auto">{{this.StockLevel}}</td>
+                                            <td class="col-auto">{{this.OnlineStatus}}</td>
+                                            <td class="col-auto">{{this.Invisible}}</td>
+                                            <td class="col-auto">{{this.ForceOutOfStock}}</td>
+                                            <td class="col-auto">{{this.CreateDate}}</td>
+                                            <td class="col-auto">{{this.OfflineDate}}</td>
+                                            <td class="col-auto">{{this.BrandNameEN}}</td>
+                                            <td class="col-auto">{{this.BrandNameCHI}}</td>
+                                            <td class="col-auto">{{this.Height}}</td>
+                                            <td class="col-auto">{{this.Width}}</td>
+                                            <td class="col-auto">{{this.Depth}}</td>
+                                            <td class="col-auto">{{this.PackingSpecEN}}</td>
+                                            <td class="col-auto">{{this.PackingSpecCHI}}</td>
+                                            <td class="col-auto">{{this.PrimaryCategoryCode}}</td>
+                                            <td class="col-auto">{{this.PrimaryCategoryNameCHI}}</td>
+                                            <td class="col-auto">{{this.Currency}}</td>
+                                            <td class="col-auto">{{this.OriginalPrice}}</td>
+                                            <td class="col-auto">{{this.DiscountPrice}}</td>
+                                            <td class="col-auto">{{this.DiscountRate}}</td>
+                                            <td class="col-auto">{{this.VIPDiscountPrice}}</td>
+                                            <td class="col-auto">{{this.VIPDiscountRate}}</td>
+                                            <td class="col-auto">{{this.GOLDVIPDiscountPrice}}</td>
+                                            <td class="col-auto">{{this.GOLDVIPDiscountRate}}</td>
+                                            <td class="quantity">{{this.quantity}}</td>
+
+                                            {{#if_eq this.status 'success'}} 
+                                                <td class="col-auto"><span class="badge badge-success">Success</span></td>
+                                            {{else}}    
+                                                {{#if_eq this.status 'invalid quantity'}}            
+                                                <td class="col-auto"><span class="badge badge-danger">InValid</span></td>
+                                                {{else}}
+                                                    {{#if_eq this.status 'invalid productId or product is offline'}}            
+                                                        <td class="col-auto"><span class="badge badge-danger">InValid</span></td>
+                                                    {{/if_eq}}
+                                                {{/if_eq}}
+                                            {{/if_eq}}
+
+                                        </tr>
+                                        {{/each}}
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+
+                        <div class="col-5" style="padding-left: 0px;margin-right:5px ">
+                            <div class="row">
+                                {{#if data}}
+                                {{#each data}}
+                                <form class="px-2 pb-2 pt-2" style="border: 2px solid black;border-radius: 15px;position: relative;
+                                right: 22px;padding-right: 10px;">
+
+                                    <div class="col-12 text-center pt-2 pb-2">
+                                        <label style="font-weight:bold;">Update Product</label>
+                                    </div>
+
+                                    <div class="row pt-2">
+                                        <div class="col-auto">
+                                            <label for="sku-code" style="font-weight: bold">SKU Code :</label>
+                                        </div>
+                                        <div class="col-4" style="margin-left: 39px;">
+                                            <input type="text" class="form-control" placeholder="SKU Code"
+                                                name="skuCode" value="{{this.skuCode}}" required>
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="text" class="form-control" placeholder="Store Code"
+                                                value="{{this.storefrontStoreCode}}" name="storeCode" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-2">
+                                        <div class="col-3">
+                                            <label for="sku-name" style="font-weight: bold">SKU Name :</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="text" class="form-control" placeholder="SKU Name"
+                                                name="SkuName" value="{{this.skuName}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-2">
+                                        <div class="col-3">
+                                            <label for="sku-chinese" style="font-weight: bold">SKU Chinese:</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="text" class="form-control" placeholder="SKU Chinese"
+                                                id="Sku Chinese" value="{{this.skuNameTchi}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-2 ">
+                                        <div class="col-3">
+                                            <label for="brand"
+                                                style="font-weight:bold;position: relative;top: 5px;">Brand</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" class="form-control" placeholder="Brand" id="Brand"
+                                                value="{{this.brandNameEn}}" required>
+                                        </div>
+
+                                        <div class="col-3">
+                                            <label for="brandChinese"
+                                                style="font-weight:bold;position: relative;top: 5px;">Brand
+                                                Chinese</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" class="form-control" placeholder="Brand Chinese"
+                                                name="BrandChinese" value="{{this.brandNameTc}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row py-2">
+                                        <div class="col-3">
+                                            <label for="" style="font-weight:bold;">**</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" class="form-control" placeholder="128.0" id="*" required>
+                                        </div>
+                                        <div class="col-3">
+                                            <label for="Current debt." style="font-weight:bold;">Current debt.</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" class="form-control" placeholder="Current debt."
+                                                name="Current debt." required>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="row py-2">
+                                        <div class="col-3">
+                                            <label for="" style="font-weight:bold;">BarCode</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" class="form-control" placeholder="Bar Code" id="barcode1"
+                                                value="{{this.barcode}}" required>
+                                        </div>
+                                        <div class="col-3">
+                                            <label for="" style="font-weight:bold;">Invisible Flag</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="input-group">
+                                                <select class="custom-select" name="InvisibleFlag" required>
+                                                    <option value="{{this.invisibleFlag}}">{{this.invisibleFlag}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row py-2">
+                                        <div class="col-3">
+                                            <label style="font-weight:bold;">Style</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="input-group ">
+                                                <select class="custom-select" name="Style" required>
+                                                    <option value="{{this.style}}">{{this.style}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-3">
+                                            <label for="" style="font-weight:bold;">onOffineStatus</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="input-group ">
+                                                <select class="custom-select" name="onOfflineStatus" required>
+                                                    <option value="{{this.onOfflineStatus}}">{{this.onOfflineStatus}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-2">
+                                        <div class="col-3">
+                                            <label for="client-name" style="font-weight: bold;">Discount</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="text" class="form-control" placeholder="discount"
+                                                name="discount" value="{{this.discountText}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-2 pb-2">
+                                        <div class="col-3">
+                                            <label for="client-name" style="font-weight: bold">Discount Chi</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="text" class="form-control" placeholder="Discount Chi"
+                                                value="{{this.discountTextTchi}}">
+                                        </div>
+                                    </div>
+
+                                    {{!-- <div class="col-12 text-right pt-3 pb-2">
+                                        <button type="Submit"
+                                            class="btn btn-outline-light-100 text-white text-center btn-primary">Update</button>
+                                    </div> --}}
+                                </form>
+                                {{/each}}
+                                {{else}}
+                                <form class="px-2 pb-2 pt-2" style="border: 2px solid black;border-radius: 15px;position: relative;
+                                right: 22px;padding-right: 10px;">
+
+                                    <div class="col-12 text-center pt-2 pb-2">
+                                        <label style="font-weight:bold;">Update Product data</label>
+                                    </div>
+
+                                    <div class="row pt-2">
+                                        <div class="col-auto">
+                                            <label for="sku-code" style="font-weight: bold">SKU Code :</label>
+                                        </div>
+                                        <div class="col-4" style="margin-left: 39px;">
+                                            <input type="text" class="form-control" placeholder="SKU Code"
+                                                name="skuCode" value="{{this.skuCode}}" required>
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="text" class="form-control" placeholder="Store Code"
+                                                value="{{this.storefrontStoreCode}}" name="storeCode" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-2">
+                                        <div class="col-3">
+                                            <label for="sku-name" style="font-weight: bold">SKU Name :</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="text" class="form-control" placeholder="SKU Name"
+                                                name="SkuName" value="{{this.skuName}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-2">
+                                        <div class="col-3">
+                                            <label for="sku-chinese" style="font-weight: bold">SKU Chinese:</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="text" class="form-control" placeholder="SKU Chinese"
+                                                id="Sku Chinese" value="{{this.skuNameTchi}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-2 ">
+                                        <div class="col-3">
+                                            <label for="brand"
+                                                style="font-weight:bold;position: relative;top: 5px;">Brand</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" class="form-control" placeholder="Brand" id="Brand"
+                                                value="{{this.brandNameEn}}" required>
+                                        </div>
+
+                                        <div class="col-3">
+                                            <label for="brandChinese"
+                                                style="font-weight:bold;position: relative;top: 5px;">Brand
+                                                Chinese</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" class="form-control" placeholder="Brand Chinese"
+                                                name="BrandChinese" value="{{this.brandNameTc}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row py-2">
+                                        <div class="col-3">
+                                            <label for="" style="font-weight:bold;">**</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" class="form-control" placeholder="128.0" id="*" required>
+                                        </div>
+                                        <div class="col-3">
+                                            <label for="Current debt." style="font-weight:bold;">Current debt.</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" class="form-control" placeholder="Current debt."
+                                                name="Current debt." required>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="row py-2">
+                                        <div class="col-3">
+                                            <label for="" style="font-weight:bold;">BarCode</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="text" class="form-control" placeholder="Bar Code" id="barcode1"
+                                                value="{{this.barcode}}" required>
+                                        </div>
+                                        <div class="col-3">
+                                            <label for="" style="font-weight:bold;">Invisible Flag</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="input-group">
+                                                <select class="custom-select" name="InvisibleFlag" required>
+                                                    <option value="{{this.invisibleFlag}}">{{this.invisibleFlag}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row py-2">
+                                        <div class="col-3">
+                                            <label style="font-weight:bold;">Style</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="input-group ">
+                                                <select class="custom-select" name="Style" required>
+                                                    <option value="{{this.style}}">{{this.style}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-3">
+                                            <label for="" style="font-weight:bold;">onOffineStatus</label>
+                                        </div>
+                                        <div class="col-3">
+                                            <div class="input-group ">
+                                                <select class="custom-select" name="onOfflineStatus" required>
+                                                    <option value="{{this.onOfflineStatus}}">{{this.onOfflineStatus}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-2">
+                                        <div class="col-3">
+                                            <label for="client-name" style="font-weight: bold;">Discount</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="text" class="form-control" placeholder="discount"
+                                                name="discount" value="{{this.discountText}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row pt-2 pb-2">
+                                        <div class="col-3">
+                                            <label for="client-name" style="font-weight: bold">Discount Chi</label>
+                                        </div>
+                                        <div class="col-9">
+                                            <input type="text" class="form-control" placeholder="Discount Chi"
+                                                value="{{this.discountTextTchi}}">
+                                        </div>
+                                    </div>
+
+                                    {{!-- <div class="col-12 text-right pt-3 pb-2">
+                                        <button type="Submit"
+                                            class="btn btn-outline-light-100 text-white text-center btn-primary">Update</button>
+                                    </div> --}}
+                                </form>
+                                {{/if}}
+                                <hr>
+
+                                {{!-- {{#if_eq stock_Message null}}
+                                {{#each stockData}} --}}
+                                <div style="border: 2px solid black;border-radius: 15px;position: relative;
+                                    right: 22px;padding-right: 10px;">
+
+                                    <div class="col-12 text-center pt-2 pb-2">
+                                        <label style="font-weight:bold;">Update Stock</label>
+                                    </div>
+
+
+                                    <div class="row py-2" style="margin: 0px 30px;">
+                                        <div class="col-2">
+                                            <label for="Inventory Status" style="font-weight:bold;">Inventory
+                                                Status</label>
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="text" class="form-control" name="InventoryStatus"
+                                                value="{{stockData.instockStatus}}" required>
+                                        </div>
+                                        <div class="col-2">
+                                            <label for="InProgress" style="font-weight:bold;">Progress</label>
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="text" class="form-control" placeholder="In Progress"
+                                                name="InProgress" value="{{stockData.inProcess}}" required>
+                                        </div>
+                                        <div class="col-2">
+                                            <label for="Quantity" style="font-weight:bold;">Quantity</label>
+                                        </div>
+                                        <div class="col-4">
+                                            <input type="text" class="form-control" placeholder="Quantity" id="Quantity"
+                                                name="Quantity" value="{{stockData.availableToSell}}" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12 text-right pt-2 pb-2">
+                                        <a href="javascript:UpdateStock('{{stockData.store}}', '{{stockData.productId}}' )"
+                                            class="btn btn-primary" role="button">
+                                            Update Stock</a>
+                                    </div>
+
+                                    <br><br>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- side bar -->
+
+    <script  src="./assets/js/UpdateProductStock.js"></script>
+    {{!-- <script type="text/javascript">
+       $('#attach').click(function() {
+        debugger
+           $('#spinImg').show();
+            $('#spinText').show();
+
+            window.location.replace('/updateAllProducts')
+
+           return false;
+
+       });        
+    </script> --}}
+</body>
+
+</html>

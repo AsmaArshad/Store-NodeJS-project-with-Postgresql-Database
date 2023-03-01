@@ -1,0 +1,64 @@
+
+CREATE TABLE IF NOT EXISTS public.products
+(
+    "Id" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    "MerchantID" character varying COLLATE pg_catalog."default",
+    "MerchantProductID" character varying COLLATE pg_catalog."default",
+    "PrimarySKU" character varying COLLATE pg_catalog."default",
+    "MerchantSKUID" character varying COLLATE pg_catalog."default",
+    "SKUName" character varying COLLATE pg_catalog."default",
+    "SKUNameChi" character varying COLLATE pg_catalog."default",
+    "WarehouseID" character varying COLLATE pg_catalog."default",
+    "StockLevel" character varying COLLATE pg_catalog."default",
+    "OnlineStatus" character varying COLLATE pg_catalog."default",
+    "Invisible" character varying COLLATE pg_catalog."default",
+    "ForceOutOfStock" character varying COLLATE pg_catalog."default",
+    "CreateDate" character varying COLLATE pg_catalog."default",
+    "OfflineDate" character varying COLLATE pg_catalog."default",
+    "BrandNameEN" character varying COLLATE pg_catalog."default",
+    "BrandNameCHI" character varying COLLATE pg_catalog."default",
+    "Height" character varying COLLATE pg_catalog."default",
+    "Width" character varying COLLATE pg_catalog."default",
+    "Depth" character varying COLLATE pg_catalog."default",
+    "PackingSpecEN" character varying COLLATE pg_catalog."default",
+    "PackingSpecCHI" character varying COLLATE pg_catalog."default",
+    "PrimaryCategoryCode" character varying COLLATE pg_catalog."default",
+    "PrimaryCategoryNameCHI" character varying COLLATE pg_catalog."default",
+    "Currency" character varying COLLATE pg_catalog."default",
+    "OriginalPrice" character varying COLLATE pg_catalog."default",
+    "DiscountPrice" character varying COLLATE pg_catalog."default",
+    "DiscountRate" character varying COLLATE pg_catalog."default",
+    "VIPDiscountPrice" character varying COLLATE pg_catalog."default",
+    "VIPDiscountRate" character varying COLLATE pg_catalog."default",
+    "GOLDVIPDiscountPrice" character varying COLLATE pg_catalog."default",
+    "GOLDVIPDiscountRate" character varying COLLATE pg_catalog."default",
+    status character varying COLLATE pg_catalog."default",
+    quantity character varying COLLATE pg_catalog."default",
+    CONSTRAINT products_pkey PRIMARY KEY ("Id")
+)
+
+TABLESPACE pg_default;
+
+
+CREATE TABLE IF NOT EXISTS public.store
+(
+    "Id" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    "storefrontStoreCode" character varying COLLATE pg_catalog."default" NOT NULL,
+    uuid character varying COLLATE pg_catalog."default" NOT NULL,
+    "filePath" character varying COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT store_pkey PRIMARY KEY ("Id")
+)
+
+TABLESPACE pg_default;
+
+
+CREATE TABLE IF NOT EXISTS public.users
+(
+    "Id" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    "Name" character varying COLLATE pg_catalog."default" NOT NULL,
+    "Email" character varying COLLATE pg_catalog."default" NOT NULL,
+    "Password" character varying COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT users_pkey PRIMARY KEY ("Id")
+)
+
+TABLESPACE pg_default;

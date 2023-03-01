@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>{{title}}</title>
+
+	<!-- Global stylesheets -->
+	<link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
+	<link href="/global_assets/css/icons/icomoon/styles.min.css" rel="stylesheet" type="text/css">
+	<link href="/assets/css/all.min.css" rel="stylesheet" type="text/css">
+	
+	<!-- /global stylesheets -->
+
+	<!-- Core JS files -->
+	<script src="/global_assets/js/main/jquery.min.js"></script>
+	<script src="/global_assets/js/main/bootstrap.bundle.min.js"></script>
+	<!-- /core JS files -->
+
+	<!-- Theme JS files -->
+	<script src="/global_assets/js/plugins/visualization/echarts/echarts.min.js"></script>
+	<script src="/global_assets/js/plugins/maps/echarts/world.js"></script>
+
+	<script src="/assets/js/app.js"></script>
+	<script src="/global_assets/js/demo_charts/pages/dashboard_6/dark/area_gradient.js"></script>
+	<script src="/global_assets/js/demo_charts/pages/dashboard_6/dark/map_europe_effect.js"></script>
+	<script src="global_assets/js/demo_charts/pages/dashboard_6/dark/progress_sortable.js"></script>
+	<script src="global_assets/js/demo_charts/pages/dashboard_6/dark/bars_grouped.js"></script>
+	<script src="/global_assets/js/demo_charts/pages/dashboard_6/dark/line_label_marks.js"></script>
+	<!-- /theme JS files -->
+
+	<style>
+		.mod-btn:hover{
+			color: green;
+			text-decoration: underline;
+		}
+		.del-btn:hover{
+			color: red;
+			text-decoration: underline;
+		}
+	</style>
+</head>
+<body>
+    <!-- Nav bar -->
+    <div class="navbar navbar-expand-xl navbar-light navbar-static px-0">
+
+		<div class="d-flex w-100 w-xl-auto overflow-auto overflow-xl-visible scrollbar-hidden border-top border-top-light-100 border-top-xl-0 order-1 order-xl-0">
+			<ul class="navbar-nav navbar-nav-underline flex-row text-nowrap mx-auto">
+				<li class="nav-item">
+					<a href="/SetUp" class="navbar-nav-link active">
+						<i class="icon-person mr-2"></i>
+						Setup
+					</a>
+				</li>
+
+				<li class="nav-item">
+					<a href="/Product" class="navbar-nav-link">
+						<i class="icon-person mr-2"></i>
+						Product
+					</a>
+				</li>
+
+
+			</ul>
+		</div>
+
+	</div>
+    <!-- / Nav Bar -->
+<style>
+	::file-selector-button {
+	display: none;
+	}
+</style>
+<script>
+	function EditSetUp(type, Id) {
+		let action = ''
+		if (type == 'edit') {
+			var str = Id.toString();
+			action = '/SetUp/Edit/' + window.btoa(str);
+
+			window.location.replace(action);
+			return;
+		}
+		else {
+			var str = Id.toString();
+			action = '/SetUp/Delete/' + window.btoa(str);
+			if (!confirm('Are you sure you want to delete the SetUp?'))
+				return;
+		}
+
+		const form = document.createElement('form');
+		form.method = 'post';
+		form.action = action;
+		const hiddenField = document.createElement('input');
+		hiddenField.type = 'hidden';
+		hiddenField.value = 'edit';
+
+		form.appendChild(hiddenField);
+		document.body.appendChild(form);
+		form.submit();
+
+		 
+
+
+	}
+	setTimeout(() => {
+			$('#success_msg').fadeOut('fast');
+			$('#error_msg').fadeOut('fast');
+		}, 10000); // <-- time in milliseconds 
+</script>
+<div class="page-content">
+	<div class="content-wrapper">
+		<!-- Inner content -->
+		<div class="content-inner">
+
+			<!-- Content area -->
+			<div class="content container-fluid py-4">
+
+				<!-- Latest orders -->
+				<div class="card py-0 px-0" style="margin: 0px 70px">
+					<form method="post" enctype="multipart/form-data">
+						<div class="row pt-3 pb-3 mt-2  writer-top-sec">
+
+							<div class="col writer-start">
+								<input type="text" class="form-control" placeholder="Storecode" name="storeCode"
+									value="{{storeData.storefrontStoreCode}}" style="border:none" required>
+							</div>
+							<div class="col writer-end">
+								<input type="text" class="form-control" placeholder="uuid" name="uuid"
+									value="{{storeData.uuid}}" style="border:none" required>
+							</div>
+							<div class="col writer-end" >
+								<input type="button" class="form-control" id="loadFileXml" style="border: none"
+									value="Private Key" onclick="document.getElementById('file').click();" />
+								<input type="hidden" name="filePath" value="{{storeData.filePath}}">
+								<input id='file' name="files" type="file" accept=".pem">
+							</div>
+							<div class="col-2 text-right">
+								<button type="submit"
+									class="btn writer-search-btn btn-outline-light-100 text-white text-center btn-primary">Submit</button>
+							</div>
+						</div>
+					</form>
+
+					{{#if error}}
+					<p class="alert alert-danger" id="error_msg">{{error}}</p>
+					{{/if}}
+
+					{{#if success_msg}}
+					<p class="alert alert-success" id="success_msg">{{success_msg}}</p>
+					{{/if}}
+
+					<div class="w-100">
+						<table class="table table-hover w-100 text-center table-bordered">
+							<thead>
+								<tr>
+									<th scope="col">StoreCode</th>
+									<th scope="col"  style="padding: 10px 0px;">uuid</th>
+									<th>Update</th>
+									<th>Delete</th>
+								</tr>
+							</thead>
+							<tbody>														
+								{{#each data}}
+								<tr>
+									<td>{{this.storefrontStoreCode}}</td>
+									<td  style="padding: 5px 0px;">{{this.uuid}}</td>
+									<td><a href="javascript:EditSetUp('edit',{{Id}})" class="mod-btn" style="padding:2px 5px;font-size:15px"
+											role="button">Modify</a>
+									</td>
+
+									<td>
+										<a href="javascript:EditSetUp('delete',{{Id}})" class="del-btn" style="padding:2px 5px;font-size:15px"
+											role="button">
+											Delete</a>
+									</td>
+								</tr>
+								{{/each}}
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- /latest orders -->
+			</div>
+			<!-- /content area -->
+		</div>
+		<!-- /inner content -->
+	</div>
+</div>
+<!-- side bar -->
+
+</body>
+</html>
